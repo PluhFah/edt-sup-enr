@@ -3,31 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EDT Sup'EnR 3A - UPVD</title>
+  <title>EDT Sup'EnR UPVD (3A / 4A / 5A)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    .now-indicator {
-      position: absolute;
-      left: 0;
-      right: 0;
-      z-index: 30;
-      pointer-events: none;
-    }
-    .now-line {
-      height: 2px;
-      background-color: #ef4444;
-      box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
-    }
-    .now-dot {
-      width: 10px;
-      height: 10px;
-      background-color: #ef4444;
-      border-radius: 50%;
-      position: absolute;
-      left: -5px;
-      top: -4px;
-    }
+    .now-indicator { position: absolute; left: 0; right: 0; z-index: 30; pointer-events: none; }
+    .now-line { height: 2px; background-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.6); }
+    .now-dot { width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; position: absolute; left: -4px; top: -3px; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -41,26 +23,36 @@
           <i data-lucide="sun" class="w-6 h-6"></i>
         </div>
         <div>
-          <h1 class="font-bold text-lg leading-tight">Sup'EnR 3A — Emploi du Temps</h1>
-          <p class="text-xs text-indigo-200">Université de Perpignan Via Domitia (UPVD)</p>
+          <h1 class="font-bold text-lg leading-tight">Sup'EnR — UPVD</h1>
+          <p class="text-xs text-indigo-200">Emplois du Temps École d'Ingénieurs</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <span id="sync-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-          <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Sync ADE UPVD
+        <div class="flex items-center bg-indigo-950 p-1 rounded-lg border border-indigo-700">
+          <i data-lucide="users" class="w-4 h-4 ml-2 text-indigo-300"></i>
+          <select id="promo-select" onchange="changePromo()" class="bg-transparent text-xs font-bold text-white px-2 py-1 focus:outline-none cursor-pointer">
+            <option value="3A" class="bg-indigo-900">3A Sup'EnR</option>
+            <option value="4A" class="bg-indigo-900">4A Sup'EnR</option>
+            <option value="5A" class="bg-indigo-900">5A Sup'EnR</option>
+          </select>
+        </div>
+
+        <span id="sync-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          <i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Chargement...
         </span>
-        <button id="btn-sync" onclick="fetchADEData()" class="p-2 bg-indigo-800 hover:bg-indigo-700 rounded-lg text-indigo-100 transition text-xs flex items-center gap-1" title="Actualiser le flux ADE">
+
+        <button onclick="fetchADEData()" class="p-2 bg-indigo-800 hover:bg-indigo-700 rounded-lg text-indigo-100 transition text-xs" title="Actualiser">
           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
         </button>
-        <button onclick="openConfigModal()" class="p-2 bg-indigo-800 hover:bg-indigo-700 rounded-lg text-indigo-100 transition text-xs flex items-center gap-1" title="Configuration URL / Fichier">
-          <i data-lucide="settings" class="w-4 h-4"></i> Config
+        <button onclick="openConfigModal()" class="p-2 bg-indigo-800 hover:bg-indigo-700 rounded-lg text-indigo-100 transition text-xs" title="Configuration URLs">
+          <i data-lucide="settings" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <div class="bg-white border-b border-slate-200 px-4 py-2.5 flex-none shadow-sm">
+  <div class="bg-white border-b border-slate-200 px-4 py-2 flex-none shadow-sm">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
       <div class="flex items-center gap-2">
@@ -73,19 +65,19 @@
         <button onclick="changeWeek(1)" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200">
           <i data-lucide="chevron-right" class="w-4 h-4"></i>
         </button>
-        <span id="current-date-range" class="text-xs font-bold text-slate-700 ml-1">...</span>
+        <span id="current-date-range" class="text-xs font-bold text-slate-700 ml-2">...</span>
       </div>
 
       <div class="flex items-center gap-2">
         <div class="relative">
           <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
-          <input type="text" id="search-input" oninput="renderCalendar()" placeholder="Salle, prof, cours..." class="pl-8 pr-3 py-1 text-xs border border-slate-200 rounded-lg w-36 sm:w-48 focus:outline-none focus:border-indigo-500">
+          <input type="text" id="search-input" oninput="renderCalendar()" placeholder="Prof, salle, cours..." class="pl-8 pr-3 py-1 text-xs border border-slate-200 rounded-lg w-36 sm:w-48 focus:outline-none focus:border-indigo-500">
         </div>
         <select id="type-filter" onchange="renderCalendar()" class="py-1 px-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 bg-white">
-          <option value="ALL">Tous les cours</option>
-          <option value="CM">CM uniquement</option>
-          <option value="TD">TD uniquement</option>
-          <option value="TP">TP uniquement</option>
+          <option value="ALL">Tous les types</option>
+          <option value="CM">CM</option>
+          <option value="TD">TD</option>
+          <option value="TP">TP</option>
           <option value="EXAM">Examens</option>
         </select>
       </div>
@@ -93,11 +85,11 @@
     </div>
   </div>
 
-  <main class="flex-1 overflow-auto bg-slate-100 relative p-2 sm:p-4 hide-scrollbar">
-    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full min-w-[700px]">
+  <main class="flex-1 overflow-auto bg-slate-100 p-2 sm:p-4 hide-scrollbar">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-w-[700px]">
       
       <div class="grid grid-cols-6 border-b border-slate-200 bg-slate-50 text-center font-medium text-xs text-slate-600">
-        <div class="py-2.5 border-r border-slate-200 w-[48px] flex-none">H</div>
+        <div class="py-2 border-r border-slate-200 w-[45px] flex-none">H</div>
         <div id="day-header-0" class="py-2 border-r border-slate-200 flex-1">Lun</div>
         <div id="day-header-1" class="py-2 border-r border-slate-200 flex-1">Mar</div>
         <div id="day-header-2" class="py-2 border-r border-slate-200 flex-1">Mer</div>
@@ -105,29 +97,27 @@
         <div id="day-header-4" class="py-2 flex-1">Ven</div>
       </div>
 
-      <div id="grid-container" class="relative flex-1 grid grid-cols-6 divide-x divide-slate-200 overflow-y-auto" style="height: 680px;">
-        
-        <div class="w-[48px] flex-none bg-slate-50/50 text-[10px] text-slate-400 text-center select-none divide-y divide-slate-100">
-          <div class="h-[50px] flex items-center justify-center">08:00</div>
-          <div class="h-[50px] flex items-center justify-center">09:00</div>
-          <div class="h-[50px] flex items-center justify-center">10:00</div>
-          <div class="h-[50px] flex items-center justify-center">11:00</div>
-          <div class="h-[50px] flex items-center justify-center">12:00</div>
-          <div class="h-[50px] flex items-center justify-center">13:00</div>
-          <div class="h-[50px] flex items-center justify-center">14:00</div>
-          <div class="h-[50px] flex items-center justify-center">15:00</div>
-          <div class="h-[50px] flex items-center justify-center">16:00</div>
-          <div class="h-[50px] flex items-center justify-center">17:00</div>
-          <div class="h-[50px] flex items-center justify-center">18:00</div>
-          <div class="h-[50px] flex items-center justify-center">19:00</div>
+      <div id="grid-container" class="relative flex-1 grid grid-cols-6 divide-x divide-slate-200 overflow-y-auto" style="height: 600px;">
+        <div class="w-[45px] flex-none bg-slate-50/50 text-[10px] text-slate-400 text-center select-none divide-y divide-slate-100">
+          <div class="h-[50px] flex items-center justify-center">08h</div>
+          <div class="h-[50px] flex items-center justify-center">09h</div>
+          <div class="h-[50px] flex items-center justify-center">10h</div>
+          <div class="h-[50px] flex items-center justify-center">11h</div>
+          <div class="h-[50px] flex items-center justify-center">12h</div>
+          <div class="h-[50px] flex items-center justify-center">13h</div>
+          <div class="h-[50px] flex items-center justify-center">14h</div>
+          <div class="h-[50px] flex items-center justify-center">15h</div>
+          <div class="h-[50px] flex items-center justify-center">16h</div>
+          <div class="h-[50px] flex items-center justify-center">17h</div>
+          <div class="h-[50px] flex items-center justify-center">18h</div>
+          <div class="h-[50px] flex items-center justify-center">19h</div>
         </div>
 
-        <div id="col-day-0" class="relative flex-1 h-[600px] bg-white"></div>
-        <div id="col-day-1" class="relative flex-1 h-[600px] bg-white"></div>
-        <div id="col-day-2" class="relative flex-1 h-[600px] bg-white"></div>
-        <div id="col-day-3" class="relative flex-1 h-[600px] bg-white"></div>
-        <div id="col-day-4" class="relative flex-1 h-[600px] bg-white"></div>
-
+        <div id="col-day-0" class="relative flex-1 h-[600px]"></div>
+        <div id="col-day-1" class="relative flex-1 h-[600px]"></div>
+        <div id="col-day-2" class="relative flex-1 h-[600px]"></div>
+        <div id="col-day-3" class="relative flex-1 h-[600px]"></div>
+        <div id="col-day-4" class="relative flex-1 h-[600px]"></div>
       </div>
 
     </div>
@@ -138,60 +128,52 @@
       <button onclick="closeConfigModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
-      
-      <h3 class="font-bold text-slate-800 text-lg mb-1 flex items-center gap-2">
-        <i data-lucide="link" class="w-5 h-5 text-indigo-600"></i> Lien ADE UPVD
-      </h3>
-      <p class="text-xs text-slate-500 mb-4">
-        L'URL d'export anonyme d'ADE UPVD nécessite un relais proxy pour contourner les verrous CORS du navigateur.
-      </p>
 
-      <div class="space-y-4">
+      <h3 class="font-bold text-slate-800 text-lg mb-2">URLs ADE par Promotion</h3>
+      <p class="text-xs text-slate-500 mb-4">Modifiez les liens d'exportation iCal ADE pour chaque niveau :</p>
+
+      <div class="space-y-3 text-xs">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">URL iCal (.ics) ADE :</label>
-          <textarea id="ade-url-input" rows="3" class="w-full p-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-indigo-500 focus:outline-none"></textarea>
+          <label class="font-semibold text-slate-700">URL 3A Sup'EnR :</label>
+          <input type="text" id="url-3a" class="w-full p-2 border rounded font-mono mt-1 text-[11px]">
         </div>
+        <div>
+          <label class="font-semibold text-slate-700">URL 4A Sup'EnR :</label>
+          <input type="text" id="url-4a" class="w-full p-2 border rounded font-mono mt-1 text-[11px]">
+        </div>
+        <div>
+          <label class="font-semibold text-slate-700">URL 5A Sup'EnR :</label>
+          <input type="text" id="url-5a" class="w-full p-2 border rounded font-mono mt-1 text-[11px]">
+        </div>
+      </div>
 
-        <div class="flex items-center justify-between gap-2 pt-2">
-          <button onclick="saveAndSyncUrl()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 flex items-center gap-1.5">
-            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Appliquer et Synchroniser
-          </button>
-          
-          <label class="cursor-pointer px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium border border-slate-300 flex items-center gap-1.5">
-            <i data-lucide="upload" class="w-4 h-4"></i> Importer un fichier .ics
-            <input type="file" id="ics-file-input" accept=".ics" onchange="handleFileUpload(event)" class="hidden">
-          </label>
-        </div>
+      <div class="mt-5 flex items-center justify-between gap-2">
+        <button onclick="saveUrls()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700">
+          Enregistrer et recharger
+        </button>
+        <label class="cursor-pointer px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs border flex items-center gap-1 font-semibold">
+          <i data-lucide="upload" class="w-4 h-4"></i> Importer .ics manuel
+          <input type="file" accept=".ics" onchange="handleFileUpload(event)" class="hidden">
+        </label>
       </div>
     </div>
   </div>
 
   <script>
-    // URL ADE PAR DÉFAUT (SUP'ENR 3A - UPVD)
-    const DEFAULT_ADE_URL = "https://ade.univ-perp.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=15730&projectId=10&calType=ical&lastDate=2050-07-31&firstDate=2024-08-01&displayConfigId=9";
+    // URLS ADE DE BASE
+    const DEFAULT_URLS = {
+      "3A": "https://ade.univ-perp.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=15730&projectId=10&calType=ical",
+      "4A": "https://ade.univ-perp.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=15731&projectId=10&calType=ical",
+      "5A": "https://ade.univ-perp.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=15732&projectId=10&calType=ical"
+    };
 
-    // PROXIES CORS EN CASCADE
-    const PROXIES = [
-      url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-      url => `https://proxy.cors.sh/${url}`
-    ];
-
+    let currentPromo = "3A";
     let eventsList = [];
     let currentMonday = getMonday(new Date());
 
     window.onload = function() {
       lucide.createIcons();
-      document.getElementById('ade-url-input').value = localStorage.getItem('upvd_ade_url') || DEFAULT_ADE_URL;
-      
-      const cached = localStorage.getItem('upvd_events_cache');
-      if (cached) {
-        try {
-          eventsList = JSON.parse(cached);
-          renderCalendar();
-        } catch(e) {}
-      }
-
+      loadConfigInputs();
       fetchADEData();
       setInterval(updateNowIndicator, 60000);
     };
@@ -203,8 +185,13 @@
       return new Date(date.setDate(diff));
     }
 
-    function changeWeek(direction) {
-      currentMonday.setDate(currentMonday.getDate() + (direction * 7));
+    function changePromo() {
+      currentPromo = document.getElementById('promo-select').value;
+      fetchADEData();
+    }
+
+    function changeWeek(dir) {
+      currentMonday.setDate(currentMonday.getDate() + (dir * 7));
       renderCalendar();
     }
 
@@ -213,121 +200,145 @@
       renderCalendar();
     }
 
-    // RÉCUPÉRATION ROBUSTE DE L'ADE AVEC MULTI-PROXIES
+    function getPromoUrl(promo) {
+      const saved = localStorage.getItem(`ade_url_${promo}`);
+      return saved || DEFAULT_URLS[promo] || DEFAULT_URLS["3A"];
+    }
+
+    // RÉCUPÉRATION DU FLUX SANS BLOCAGE
     async function fetchADEData() {
-      const url = localStorage.getItem('upvd_ade_url') || DEFAULT_ADE_URL;
+      const url = getPromoUrl(currentPromo);
       const syncBadge = document.getElementById('sync-badge');
-      syncBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30";
-      syncBadge.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Synchronisation...`;
+      syncBadge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30";
+      syncBadge.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Chargement...`;
       lucide.createIcons();
 
-      let icsContent = null;
+      // Utilisation de proxies CORS résilients
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`
+      ];
 
-      for (let i = 0; i < PROXIES.length; i++) {
+      let rawData = null;
+
+      for (let pUrl of proxies) {
         try {
-          const proxyUrl = PROXIES[i](url);
-          const response = await fetch(proxyUrl, { cache: 'no-cache' });
-          if (response.ok) {
-            const text = await response.text();
-            if (text && text.includes("BEGIN:VCALENDAR")) {
-              icsContent = text;
+          const res = await fetch(pUrl, { cache: 'no-cache' });
+          if (res.ok) {
+            const txt = await res.text();
+            if (txt && txt.includes("BEGIN:VCALENDAR")) {
+              rawData = txt;
               break;
             }
           }
-        } catch (e) {
-          console.warn(`Proxy ${i} a échoué, essai du suivant...`);
+        } catch (e) {}
+      }
+
+      if (rawData) {
+        eventsList = parseICS(rawData);
+        localStorage.setItem(`events_cache_${currentPromo}`, JSON.stringify(eventsList));
+        syncBadge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        syncBadge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Connecté ADE (${currentPromo})`;
+      } else {
+        // Tentative de chargement du cache local
+        const cached = localStorage.getItem(`events_cache_${currentPromo}`);
+        if (cached) {
+          eventsList = JSON.parse(cached);
+          syncBadge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+          syncBadge.innerHTML = `<i data-lucide="database" class="w-3.5 h-3.5"></i> Cache local (${currentPromo})`;
+        } else {
+          syncBadge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30";
+          syncBadge.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Erreur réseau`;
         }
       }
-
-      if (icsContent) {
-        eventsList = parseICS(icsContent);
-        localStorage.setItem('upvd_events_cache', JSON.stringify(eventsList));
-        syncBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-        syncBadge.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Sync ADE UPVD`;
-        renderCalendar();
-      } else {
-        syncBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30";
-        syncBadge.innerHTML = `<i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Mode hors-ligne`;
-      }
       lucide.createIcons();
+      renderCalendar();
     }
 
-    // PARSER ICS ROBUSTE
+    // DECODEUR ICS TOLÉRANT & ULTRA FIABLE
     function parseICS(icsData) {
       const events = [];
-      const blocks = icsData.split("BEGIN:VEVENT");
+      const lines = icsData.replace(/\r/g, '').split('\n');
+      let inEvent = false;
+      let currentEvent = {};
 
-      for (let i = 1; i < blocks.length; i++) {
-        const block = blocks[i].split("END:VEVENT")[0];
-        
-        const summary = matchICSField(block, "SUMMARY");
-        const location = matchICSField(block, "LOCATION");
-        const description = matchICSField(block, "DESCRIPTION");
-        const dtstart = matchICSField(block, "DTSTART");
-        const dtend = matchICSField(block, "DTEND");
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
 
-        if (dtstart && dtend) {
-          const start = parseICSDate(dtstart);
-          const end = parseICSDate(dtend);
-          if (start && end) {
-            events.push({
-              title: summary || "Cours",
-              location: location || "Salle non spécifiée",
-              teacher: extractTeacher(description),
-              start: start.toISOString(),
-              end: end.toISOString(),
-              type: detectType(summary, description)
-            });
+        // Gestion du pliage de ligne ICS (line folding)
+        while (i + 1 < lines.length && (lines[i + 1].startsWith(' ') || lines[i + 1].startsWith('\t'))) {
+          line += lines[i + 1].substring(1);
+          i++;
+        }
+
+        if (line.startsWith('BEGIN:VEVENT')) {
+          inEvent = true;
+          currentEvent = {};
+        } else if (line.startsWith('END:VEVENT')) {
+          inEvent = false;
+          if (currentEvent.start && currentEvent.end) {
+            events.push(currentEvent);
+          }
+        } else if (inEvent) {
+          if (line.startsWith('SUMMARY:')) {
+            currentEvent.title = cleanText(line.substring(8));
+          } else if (line.startsWith('LOCATION:')) {
+            currentEvent.location = cleanText(line.substring(9)) || 'Salle non définie';
+          } else if (line.startsWith('DESCRIPTION:')) {
+            const desc = cleanText(line.substring(12));
+            currentEvent.teacher = extractTeacher(desc);
+            currentEvent.type = detectType(currentEvent.title || '', desc);
+          } else if (line.startsWith('DTSTART')) {
+            currentEvent.start = parseICSDate(line.split(':')[1]);
+          } else if (line.startsWith('DTEND')) {
+            currentEvent.end = parseICSDate(line.split(':')[1]);
           }
         }
       }
       return events;
     }
 
-    function matchICSField(block, field) {
-      const reg = new RegExp(`${field}(?:;[^:]*)?:(.*)`, "i");
-      const match = block.match(reg);
-      return match ? match[1].trim().replace(/\\,/g, ",").replace(/\\n/g, "\n") : "";
+    function cleanText(str) {
+      return str.replace(/\\,/g, ',').replace(/\\n/g, ' ').replace(/\\;/g, ';').trim();
     }
 
-    function parseICSDate(str) {
-      const clean = str.replace(/[^0-9T]/g, "");
-      if (clean.length < 15) return null;
-      const y = parseInt(clean.substr(0, 4));
-      const m = parseInt(clean.substr(4, 2)) - 1;
-      const d = parseInt(clean.substr(6, 2));
-      const h = parseInt(clean.substr(9, 2));
-      const min = parseInt(clean.substr(11, 2));
+    function parseICSDate(dtStr) {
+      if (!dtStr) return null;
+      const c = dtStr.replace(/[^0-9T]/g, '');
+      if (c.length < 15) return null;
+      const y = parseInt(c.substr(0, 4));
+      const m = parseInt(c.substr(4, 2)) - 1;
+      const d = parseInt(c.substr(6, 2));
+      const h = parseInt(c.substr(9, 2));
+      const min = parseInt(c.substr(11, 2));
       return new Date(Date.UTC(y, m, d, h, min));
     }
 
     function extractTeacher(desc) {
-      if (!desc) return "";
-      const lines = desc.split("\n");
-      return lines.length > 1 ? lines[1].trim() : "";
+      if (!desc) return '';
+      const parts = desc.split(' ');
+      return parts.length > 2 ? parts.slice(0, 3).join(' ') : desc;
     }
 
     function detectType(title, desc) {
-      const txt = (title + " " + desc).toUpperCase();
-      if (txt.includes("EXAM") || txt.includes("EVALUATION") || txt.includes("DS")) return "EXAM";
-      if (txt.includes("TP") || txt.includes("TRAVAUX PRATIQUES")) return "TP";
-      if (txt.includes("TD") || txt.includes("TRAVAUX DIRIGES")) return "TD";
-      return "CM";
+      const full = (title + ' ' + desc).toUpperCase();
+      if (full.includes('EXAM') || full.includes('DS') || full.includes('EVALUATION')) return 'EXAM';
+      if (full.includes('TP')) return 'TP';
+      if (full.includes('TD')) return 'TD';
+      return 'CM';
     }
 
-    // RENDU DU CALENDRIER COMPACT
+    // RENDU DE L'EMPLOI DU TEMPS
     function renderCalendar() {
       const search = document.getElementById('search-input').value.toLowerCase();
       const filter = document.getElementById('type-filter').value;
       const todayStr = new Date().toDateString();
 
-      // Mise à jour de l'en-tête de date
       const friday = new Date(currentMonday);
       friday.setDate(friday.getDate() + 4);
       document.getElementById('current-date-range').innerText = 
-        `${currentMonday.toLocaleDateString('fr-FR', {day:'numeric', month:'short'})} - ${friday.toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'})}`;
+        `${currentMonday.toLocaleDateString('fr-FR', {day:'numeric', month:'short'})} - ${friday.toLocaleDateString('fr-FR', {day:'numeric', month:'short'})}`;
 
-      // Nettoyage et surlignage des colonnes
       for (let d = 0; d < 5; d++) {
         const colDate = new Date(currentMonday);
         colDate.setDate(colDate.getDate() + d);
@@ -340,8 +351,8 @@
 
         if (isToday) {
           header.className = "py-2 border-r border-slate-200 flex-1 font-bold bg-indigo-100 text-indigo-900 border-b-2 border-b-indigo-600";
-          header.innerText = `${colDate.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric'})} (Aujourd'hui)`;
-          col.className = "relative flex-1 h-[600px] bg-indigo-50/30";
+          header.innerText = `${colDate.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric'})}`;
+          col.className = "relative flex-1 h-[600px] bg-indigo-50/20";
         } else {
           header.className = "py-2 border-r border-slate-200 flex-1";
           header.innerText = colDate.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric'});
@@ -349,13 +360,13 @@
         }
       }
 
-      // Placement des événements
       eventsList.forEach(ev => {
+        if (!ev.start || !ev.end) return;
         const start = new Date(ev.start);
         const end = new Date(ev.end);
 
         if (filter !== 'ALL' && ev.type !== filter) return;
-        if (search && !ev.title.toLowerCase().includes(search) && !ev.location.toLowerCase().includes(search) && !ev.teacher.toLowerCase().includes(search)) return;
+        if (search && !ev.title?.toLowerCase().includes(search) && !ev.location?.toLowerCase().includes(search)) return;
 
         const dayDiff = Math.floor((start - currentMonday) / (1000 * 60 * 60 * 24));
         if (dayDiff >= 0 && dayDiff < 5) {
@@ -365,22 +376,21 @@
           const startHour = start.getHours() + (start.getMinutes() / 60);
           const endHour = end.getHours() + (end.getMinutes() / 60);
 
-          // Calcul de position (08h00 - 20h00 = 12h = 600px -> 50px/heure)
           const top = Math.max(0, (startHour - 8) * 50);
-          const height = Math.max(20, (endHour - startHour) * 50);
+          const height = Math.max(22, (endHour - startHour) * 50);
 
           const card = document.createElement('div');
           card.style.top = `${top}px`;
           card.style.height = `${height}px`;
-          card.className = `absolute left-0.5 right-0.5 p-1.5 rounded border text-[11px] leading-tight overflow-hidden shadow-xs cursor-pointer transition hover:z-20 hover:shadow-md ${getBadgeStyle(ev.type)}`;
+          card.className = `absolute left-0.5 right-0.5 p-1 rounded border text-[10.5px] leading-tight overflow-hidden shadow-xs cursor-pointer ${getBadgeStyle(ev.title, ev.type)}`;
+
           
           card.innerHTML = `
-            <div class="font-bold truncate">${ev.title}</div>
-            <div class="flex items-center justify-between text-[10px] opacity-90 mt-0.5">
-              <span>${start.toLocaleTimeString('fr-FR', {hour:'2d', minute:'2d'})} - ${end.toLocaleTimeString('fr-FR', {hour:'2d', minute:'2d'})}</span>
-              <span class="font-semibold bg-white/50 px-1 rounded">${ev.location}</span>
+            <div class="font-bold truncate">${ev.title || 'Cours'}</div>
+            <div class="flex items-center justify-between text-[9.5px] opacity-90">
+              <span>${start.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})} - ${end.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
+              <span class="font-semibold bg-white/60 px-1 rounded text-[9px]">${ev.location}</span>
             </div>
-            ${height > 40 && ev.teacher ? `<div class="text-[9.5px] opacity-75 truncate mt-0.5">${ev.teacher}</div>` : ''}
           `;
           col.appendChild(card);
         }
@@ -389,17 +399,43 @@
       updateNowIndicator();
     }
 
-    function getBadgeStyle(type) {
-      switch(type) {
-        case 'CM': return 'bg-sky-100 border-sky-300 text-sky-900';
-        case 'TD': return 'bg-emerald-100 border-emerald-300 text-emerald-900';
-        case 'TP': return 'bg-amber-100 border-amber-300 text-amber-900';
-        case 'EXAM': return 'bg-rose-100 border-rose-400 text-rose-900 font-bold';
-        default: return 'bg-indigo-100 border-indigo-300 text-indigo-900';
-      }
-    }
+    
+  // Génère une couleur pastel unique à partir du nom du cours
+function getBadgeStyle(title, type) {
+  // Les examens restent strictement en rouge
+  if (type === 'EXAM') {
+    return 'bg-rose-100 border-rose-400 text-rose-900 font-bold';
+  }
 
-    // INDICATEUR D'HEURE ACTUELLE
+  if (!title) return 'bg-slate-100 border-slate-300 text-slate-900';
+
+  // Palette de teintes pastel distinctes pour les matières
+  const palette = [
+    'bg-sky-100 border-sky-300 text-sky-900',
+    'bg-emerald-100 border-emerald-300 text-emerald-900',
+    'bg-amber-100 border-amber-300 text-amber-900',
+    'bg-violet-100 border-violet-300 text-violet-900',
+    'bg-teal-100 border-teal-300 text-teal-900',
+    'bg-indigo-100 border-indigo-300 text-indigo-900',
+    'bg-orange-100 border-orange-300 text-orange-900',
+    'bg-fuchsia-100 border-fuchsia-300 text-fuchsia-900',
+    'bg-lime-100 border-lime-300 text-lime-900',
+    'bg-cyan-100 border-cyan-300 text-cyan-900'
+  ];
+
+  // Nettoyage du titre pour regrouper CM/TD/TP d'une même matière sous la même couleur
+  const cleanTitle = title.replace(/\b(CM|TD|TP|EXAM|EVALUATION|DS)\b/gi, '').trim().toUpperCase();
+
+  // Algorithme de hachage simple pour associer toujours la même couleur au même nom
+  let hash = 0;
+  for (let i = 0; i < cleanTitle.length; i++) {
+    hash = cleanTitle.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const index = Math.abs(hash) % palette.length;
+  return palette[index];
+}
+
     function updateNowIndicator() {
       const old = document.getElementById('now-indicator');
       if (old) old.remove();
@@ -418,37 +454,4 @@
           indicator.id = 'now-indicator';
           indicator.className = 'now-indicator';
           indicator.style.top = `${top}px`;
-          indicator.innerHTML = `<div class="now-dot"></div><div class="now-line"></div>`;
-          col.appendChild(indicator);
-        }
-      }
-    }
-
-    // GESTION MODAL ET IMPORT
-    function openConfigModal() { document.getElementById('config-modal').classList.remove('hidden'); }
-    function closeConfigModal() { document.getElementById('config-modal').classList.add('hidden'); }
-
-    function saveAndSyncUrl() {
-      const val = document.getElementById('ade-url-input').value.trim();
-      if (val) {
-        localStorage.setItem('upvd_ade_url', val);
-        closeConfigModal();
-        fetchADEData();
-      }
-    }
-
-    function handleFileUpload(evt) {
-      const file = evt.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        eventsList = parseICS(e.target.result);
-        localStorage.setItem('upvd_events_cache', JSON.stringify(eventsList));
-        closeConfigModal();
-        renderCalendar();
-      };
-      reader.readAsText(file);
-    }
-  </script>
-</body>
-</html>
+          indicator.innerHTML = `<div class="no
